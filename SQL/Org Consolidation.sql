@@ -1,4 +1,6 @@
-ALTER VIEW dbo.[Organization_Crosswalk] AS
+USE [APRA-IL]
+GO
+
 
 SELECT DISTINCT 
 C.Organization,
@@ -146,3 +148,5 @@ FROM [APRA-IL].[dbo].Contacts C WITH (NOLOCK)
 --"Org"
 
 GO
+
+

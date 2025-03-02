@@ -1,5 +1,15 @@
+USE [APRA-IL]
+GO
 
-ALTER PROCEDURE DBO.[Delete_Future_Events] AS
+/****** Object:  StoredProcedure [dbo].[Delete_Future_Events]    Script Date: 3/1/2025 9:46:58 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+ALTER PROCEDURE [dbo].[Delete_Future_Events] AS
 
 ----- DELETE FROM EVENT REGISTRATION FIELDS TABLE -----
 DELETE EF

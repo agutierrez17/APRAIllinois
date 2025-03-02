@@ -1,12 +1,13 @@
 USE [APRA-IL]
 GO
 
-/****** Object:  View [dbo].[APRA-IL_Contacts]    Script Date: 2/18/2025 8:23:33 PM ******/
+/****** Object:  View [dbo].[APRA-IL_Contacts]    Script Date: 3/1/2025 7:44:15 PM ******/
 SET ANSI_NULLS ON
 GO
 
 SET QUOTED_IDENTIFIER ON
 GO
+
 
 
 
