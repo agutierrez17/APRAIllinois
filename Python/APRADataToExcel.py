@@ -15,6 +15,9 @@ warnings.filterwarnings("ignore")
 print('Connecting to database...')
 print('')
 conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};'
+                      'SERVER=localhost;'
+                      'DATABASE=APRA-IL;'
+                      'UID=ANDREWACER\andre;'
                       'Trusted_Connection=yes;')
 cursor = conn.cursor()
 
@@ -90,6 +93,7 @@ df = pd.read_sql(sql,conn)
 # Open up pandas ExcelWriter, write Contacts data to Excel sheet
 print('Writing Contact data to APRA-IL Data.xlsx Excel sheet...')
 print('')
+writer = pd.ExcelWriter("C:\\Users\\andre\\Documents\\APRA_IL\\Apra-IL Data.xlsx")
 df.to_excel(writer,sheet_name='Contacts')
 
 
@@ -255,6 +259,7 @@ print('')
 
 # Open up workbook with OpenPyxl
 print('Opening up APRA-IL Data.xlsx Excel sheet with OpenPyxl...')
+path = 'C:\\Users\\andre\\Documents\\APRA_IL\\Apra-IL Data.xlsx'
 book = load_workbook(path)
 
 # Create a currency style
