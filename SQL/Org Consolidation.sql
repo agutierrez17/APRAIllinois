@@ -1,6 +1,14 @@
 USE [APRA-IL]
 GO
 
+/****** Object:  View [dbo].[Organization_Crosswalk]    Script Date: 2/27/2025 9:39:01 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER VIEW [dbo].[Organization_Crosswalk] AS
 
 SELECT DISTINCT 
 C.Organization,
@@ -47,6 +55,7 @@ WHEN C.Organization IN ('Loyola University Chicago','Loyola University of Chicag
 WHEN C.Organization IN ('Loyola University Health System','Loyola University Medical Center') THEN 'Loyola Medicine'
 WHEN C.Organization LIKE 'Southern Illinois University%' THEN 'Southern Illinois University'
 WHEN C.Organization LIKE 'SIU%' THEN 'Southern Illinois University'
+WHEN C.Organization IN ('Northwestern Medicine','NMF','Northwestern Memorial Foundation','Northwestern Memorial HealthCare') THEN 'Northwestern Memorial Foundation'
 WHEN C.Organization LIKE 'Northweste%%U%' THEN 'Northwestern University'
 WHEN C.Organization LIKE '%Feinberg%%Medicine%' THEN 'Northwestern University'
 WHEN C.Organization LIKE '%Kellogg%' THEN 'Northwestern University'
@@ -109,7 +118,6 @@ WHEN C.Organization = 'UC Santa Cruz' THEN 'University of California, Santa Cruz
 WHEN C.Organization = 'UC Davis' THEN 'University of California, Davis'
 WHEN C.Organization = 'UC Berkeley' THEN 'University of California, Berkeley'
 WHEN C.Organization = 'Texas State' THEN 'Texas State University'
-WHEN C.Organization IN ('Northwestern Medicine','NMF','Northwestern Memorial Foundation','Northwestern Memorial HealthCare') THEN 'Northwestern Memorial Foundation'
 WHEN C.Organization LIKE 'NorthShore%%H%' THEN 'NorthShore University Health System Foundation'
 WHEN C.Organization IN ('KU Endowment') THEN 'Kansas University Endowment Association'
 WHEN C.Organization IN ('LCMS') THEN 'Lutheran Church – Missouri Synod'

@@ -237,6 +237,10 @@ print('Successfully logged in to: ' + account.PrimaryDomainName)
 print('Account ID: ' + str(AccountID))
 print('')
 
+# Delete data from recent and future events
+cursor.execute("""EXEC [dbo].[Delete_Future_Events]""")
+cursor.commit()
+
 # Get date of most recent event for parameter
 cursor.execute("""SELECT MAX(CONVERT(DATE,LEFT([Start Date],10))) FROM DBO.[Events] E WITH (NOLOCK) WHERE CONVERT(DATE,LEFT(E.[Start Date],10)) <= GETDATE()""")
 last_event = cursor.fetchone()[0]
@@ -361,10 +365,8 @@ for event in events.Events:
     row = (EventID,Name,EventType,AccessLevel,Location,StartDate,StartTimeSpecified,EndDate,EndTimeSpecified,RegistrationEnabled,RegistrationsLimit,HasEnabledRegistrationTypes,ConfirmedRegistrationsCount,CheckedInAttendeesNumber,PendingRegistrationsCount,WaitListRegistrationCount,Url)
     rows.append(row)
 
-# INSERT DATA INTO EVENTS TABLE
-cursor.execute("""EXEC [dbo].[Delete_Future_Events]""")
-cursor.commit()
 
+# INSERT DATA INTO EVENTS TABLE
 print('Inserting data into Events table...')
 if rows:
     cursor.executemany("""

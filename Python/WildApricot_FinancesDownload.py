@@ -12,12 +12,17 @@ from datetime import timedelta
 print('Connecting to database...')
 print('')
 conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};'
+                      'SERVER=localhost;'
+                      'DATABASE=APRA-IL;'
+                      'UID=ANDREWACER\andre;'
                       'Trusted_Connection=yes;')
 cursor = conn.cursor()
 
 #### Authenticate API Connection ####
 print('Authenticating administrator account...')
 print('')
+api = WaApi.WaApiClient("x781ilz1yp", "97e3eyb99xg7q3hu2srvehrpdz90g0")
+api.authenticate_with_contact_credentials("andrewjamesgutierrez@gmail.com", "QD2gZYeiSgP5RQg!")
 accounts = api.execute_request("/v2/accounts")
 account = accounts[0]
 AccountID = account.Id

@@ -35,12 +35,12 @@ ISNULL(O.[Sub-Org],'') AS "Sub Organization",
 
 ---- MEMBERSHIP INFO
 CASE
+WHEN Archived = 'TRUE' THEN 'Archived'
 WHEN [Member] = 'TRUE' AND [Membership status] = 'Active' THEN 'Member-Active'
 WHEN [Member] = 'TRUE' AND [Membership status] = 'Pending - Renewal' THEN 'Member-Pending Renewal'
 WHEN [Membership status] <> 'Active' AND [Membership status] IS NOT NULL THEN 'Member-Lapsed'
 WHEN [Suspended member] = 'TRUE' THEN 'Member-Suspended'
 WHEN [Event registrant] = 'TRUE' THEN 'Event attendee'
-WHEN Archived = 'TRUE' THEN 'Archived'
 WHEN [Receiving emails disabled] = 'TRUE' THEN 'Archived'
 ELSE 'Email Recipient' END AS "Primary Contact Group",
 
@@ -55,20 +55,20 @@ ELSE 'Email Recipient' END AS "Primary Contact Group",
 [Email delivery disabled],
 [Email delivery disabled automatically],
 [Receiving emails disabled],
-[Creation date],
-[Last login date],
+CONVERT(DATE,ISNULL(REPLACE(LEFT([Creation date],10),'None','1901-01-01'),'1901-01-01')) AS "Creation date",
+CONVERT(DATE,ISNULL(REPLACE(LEFT([Last login date],10),'None','1901-01-01'),'1901-01-01')) AS "Last login date",
 [Years in Prospect Development],
 [Interested in volunteering with APRA-IL?],
-[Member since],
-[Renewal due],
-[Renewal date last changed],
-[Level last changed],
+CONVERT(DATE,ISNULL(REPLACE(LEFT([Member since],10),'None','1901-01-01'),'1901-01-01')) AS "Member since",
+CONVERT(DATE,ISNULL(REPLACE(LEFT([Renewal due],10),'None','1901-01-01'),'1901-01-01')) AS "Renewal due",
+CONVERT(DATE,ISNULL(REPLACE(LEFT([Renewal date last changed],10),'None','1901-01-01'),'1901-01-01')) AS "Renewal date last changed",
+CONVERT(DATE,ISNULL(REPLACE(LEFT([Level last changed],10),'None','1901-01-01'),'1901-01-01')) AS "Level last changed",
 
 ---- PAYMENT DATA
 COALESCE(SUM(I.[Paid Amount]),0) + COALESCE(SUM(R.[Value]),0) AS "Member Value",
 [Balance] AS "Outstanding Balance",
 (SELECT COUNT(DISTINCT P.[Payment ID]) FROM dbo.Payments P WITH (NOLOCK) WHERE P.[Contact ID] = C.[Contact ID]) AS "Number of Payments",
-ISNULL((SELECT MAX(P.[Created Date]) FROM dbo.Payments P WITH (NOLOCK) WHERE P.[Contact ID] = C.[Contact ID]),'1901-01-01') AS "Last Payment Date",
+CONVERT(DATE,ISNULL(REPLACE(LEFT((SELECT MAX(P.[Created Date]) FROM dbo.Payments P WITH (NOLOCK) WHERE P.[Contact ID] = C.[Contact ID]),10),'None','1901-01-01'),'1901-01-01')) AS "Last Payment Date",
 (SELECT P2.[Value] FROM dbo.Payments P2 WITH (NOLOCK) WHERE P2.[Contact ID] = C.[Contact ID] AND P2.[Payment ID] = (SELECT MAX(P.[Payment ID]) FROM dbo.Payments P WITH (NOLOCK) WHERE P.[Contact ID] = C.[Contact ID])) AS "Last Payment Amount",
 (SELECT I.[Order Type] FROM DBO.[Invoices] I WITH (NOLOCK) WHERE I.[Invoice ID] = (SELECT MAX(PA.[Invoice ID]) FROM DBO.[PaymentAllocations] PA WITH (NOLOCK) WHERE PA.[Payment ID] = (SELECT MAX(P.[Payment ID]) FROM dbo.Payments P WITH (NOLOCK) WHERE P.[Contact ID] = C.[Contact ID]))) AS "Last Purchase Item",
 
@@ -76,7 +76,7 @@ ISNULL((SELECT MAX(P.[Created Date]) FROM dbo.Payments P WITH (NOLOCK) WHERE P.[
 (SELECT COUNT(DISTINCT ER.[Event ID]) FROM dbo.EventRegistrations ER WITH (NOLOCK) WHERE ER.[Contact ID] = C.[Contact ID]) AS "Events Attended",
 (SELECT COUNT(DISTINCT ER.[Event ID]) FROM dbo.[APRA-IL_Events] ER WITH (NOLOCK) WHERE ER.[Contact ID] = C.[Contact ID] AND ER.[In-person/Virtual] = 'In-person') AS "Events Attended-In person",
 (SELECT COUNT(DISTINCT ER.[Event ID]) FROM dbo.[APRA-IL_Events] ER WITH (NOLOCK) WHERE ER.[Contact ID] = C.[Contact ID] AND ER.[In-person/Virtual] = 'Virtual') AS "Events Attended-Virtual",
-ISNULL((SELECT MAX(E.[Start Date]) FROM dbo.EventRegistrations ER WITH (NOLOCK) INNER JOIN dbo.Events E WITH (NOLOCK) ON ER.[Event ID] = E.[Event ID] WHERE ER.[Contact ID] = C.[Contact ID]),'1901-01-01') AS "Last Event Date",
+CONVERT(DATE,ISNULL(REPLACE(LEFT((SELECT MAX(E.[Start Date]) FROM dbo.EventRegistrations ER WITH (NOLOCK) INNER JOIN dbo.Events E WITH (NOLOCK) ON ER.[Event ID] = E.[Event ID] WHERE ER.[Contact ID] = C.[Contact ID]),10),'None','1901-01-01'),'1901-01-01')) AS "Last Event Date",
 (SELECT E.[Event Name] FROM DBO.[Events] E WITH (NOLOCK) WHERE E.[Start Date] = (SELECT MAX(E.[Start Date]) FROM dbo.EventRegistrations ER WITH (NOLOCK) INNER JOIN dbo.Events E WITH (NOLOCK) ON ER.[Event ID] = E.[Event ID] WHERE ER.[Contact ID] = C.[Contact ID])) AS "Last Event Name",
 (SELECT E.Location FROM DBO.[Events] E WITH (NOLOCK) WHERE E.[Start Date] = (SELECT MAX(E.[Start Date]) FROM dbo.EventRegistrations ER WITH (NOLOCK) INNER JOIN dbo.Events E WITH (NOLOCK) ON ER.[Event ID] = E.[Event ID] WHERE ER.[Contact ID] = C.[Contact ID])) AS "Last Event Location",
 
@@ -85,12 +85,12 @@ ISNULL((SELECT MAX(E.[Start Date]) FROM dbo.EventRegistrations ER WITH (NOLOCK) 
 (SELECT COUNT(DISTINCT ER.[Email ID]) FROM dbo.EmailRecipients ER WITH (NOLOCK) WHERE ER.[Contact ID] = C.[Contact ID] AND ER.[Is Opened] = 1) AS "Emails Opened",
 (SELECT COUNT(DISTINCT LC.[Email ID]) FROM dbo.LinkClicks LC WITH (NOLOCK) WHERE LC.[Contact ID] = C.[Contact ID]) AS "Emails Clicked",
 (SELECT COUNT(*) FROM dbo.LinkClicks LC WITH (NOLOCK) WHERE LC.[Contact ID] = C.[Contact ID]) AS "Total Link Clicks",
-ISNULL((SELECT MAX(ER.[Sent Date]) FROM dbo.[APRA-IL_Emails] ER WITH (NOLOCK) WHERE ER.[Contact ID] = C.[Contact ID]),'1901-01-01') AS "Last Email Received Date",
-ISNULL((SELECT MAX(ER.[Sent Date]) FROM dbo.[APRA-IL_Emails] ER WITH (NOLOCK) WHERE ER.[Contact ID] = C.[Contact ID] AND ER.[Is Opened] = 1),'1901-01-01') AS "Last Email Opened Date",
-ISNULL((SELECT MAX(ER.[Sent Date]) FROM dbo.[APRA-IL_Emails] ER WITH (NOLOCK) WHERE ER.[Contact ID] = C.[Contact ID] AND ER.Clicked = 1),'1901-01-01') AS "Last Email Click Date",
+CONVERT(DATE,ISNULL(REPLACE(LEFT((SELECT MAX(ER.[Sent Date]) FROM dbo.[APRA-IL_Emails] ER WITH (NOLOCK) WHERE ER.[Contact ID] = C.[Contact ID]),10),'None','1901-01-01'),'1901-01-01')) AS "Last Email Received Date",
+CONVERT(DATE,ISNULL(REPLACE(LEFT((SELECT MAX(ER.[Sent Date]) FROM dbo.[APRA-IL_Emails] ER WITH (NOLOCK) WHERE ER.[Contact ID] = C.[Contact ID] AND ER.[Is Opened] = 1),10),'None','1901-01-01'),'1901-01-01')) AS "Last Email Opened Date",
+CONVERT(DATE,ISNULL(REPLACE(LEFT((SELECT MAX(ER.[Sent Date]) FROM dbo.[APRA-IL_Emails] ER WITH (NOLOCK) WHERE ER.[Contact ID] = C.[Contact ID] AND ER.Clicked = 1),10),'None','1901-01-01'),'1901-01-01')) AS "Last Email Click Date",
 
 ---- AUDIT DATA
-C.[Profile Last Updated],
+CONVERT(DATE,ISNULL(REPLACE(LEFT(C.[Profile Last Updated],10),'None','1901-01-01'),'1901-01-01')) AS "Profile Last Updated",
 [Profile last updated by],
 [Notes]
 
